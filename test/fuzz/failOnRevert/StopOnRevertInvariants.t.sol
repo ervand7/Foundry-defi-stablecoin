@@ -4,19 +4,16 @@ pragma solidity ^0.8.18;
 
 // Invariants:
 // protocol must never be insolvent / undercollateralized
-// TODO: users cant create stablecoins with a bad health factor
-// TODO: a user should only be able to be liquidated if they have a bad health factor
 
-import { Test } from "forge-std/Test.sol";
-import { StdInvariant } from "forge-std/StdInvariant.sol";
-import { DSCEngine } from "../../../src/DSCEngine.sol";
-import { DecentralizedStableCoin } from "../../../src/DecentralizedStableCoin.sol";
-import { HelperConfig } from "../../../script/HelperConfig.s.sol";
-import { DeployDSC } from "../../../script/DeployDSC.s.sol";
-// import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol"; Updated mock location
-import { ERC20Mock } from "../../mocks/ERC20Mock.sol";
-import { StopOnRevertHandler } from "./StopOnRevertHandler.t.sol";
-import { console } from "forge-std/console.sol";
+import {Test} from "forge-std/Test.sol";
+import {StdInvariant} from "forge-std/StdInvariant.sol";
+import {DSCEngine} from "../../../src/DSCEngine.sol";
+import {DecentralizedStableCoin} from "../../../src/DecentralizedStableCoin.sol";
+import {HelperConfig} from "../../../script/HelperConfig.s.sol";
+import {DeployDSC} from "../../../script/DeployDSC.s.sol";
+import {ERC20Mock} from "../../mocks/ERC20Mock.sol";
+import {StopOnRevertHandler} from "./StopOnRevertHandler.t.sol";
+import {console} from "forge-std/console.sol";
 
 contract StopOnRevertInvariants is StdInvariant, Test {
     DSCEngine public dsce;
@@ -48,7 +45,6 @@ contract StopOnRevertInvariants is StdInvariant, Test {
         (ethUsdPriceFeed, btcUsdPriceFeed, weth, wbtc) = helperConfig.activeNetworkConfig();
         handler = new StopOnRevertHandler(dsce, dsc);
         targetContract(address(handler));
-        // targetContract(address(ethUsdPriceFeed)); Why can't we just do this?
     }
 
     function invariant_protocolMustHaveMoreValueThatTotalSupplyDollars() public view {
@@ -73,9 +69,5 @@ contract StopOnRevertInvariants is StdInvariant, Test {
         dsce.getMinHealthFactor();
         dsce.getPrecision();
         dsce.getDsc();
-        // dsce.getTokenAmountFromUsd();
-        // dsce.getCollateralTokenPriceFeed();
-        // dsce.getCollateralBalanceOfUser();
-        // getAccountCollateralValue();
     }
 }

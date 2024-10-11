@@ -64,8 +64,6 @@ contract ContinueOnRevertInvariants is StdInvariant, Test {
         assert(wethValue + wbtcValue >= totalSupply);
     }
 
-    // function invariant_userCantCreateStabelcoinWithPoorHealthFactor() public {}
-
     /// forge-config: default.invariant.fail-on-revert = false
     function invariant_callSummary() public view {
         handler.callSummary();

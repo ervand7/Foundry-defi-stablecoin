@@ -4,7 +4,6 @@ pragma solidity ^0.8.18;
 
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {Test} from "forge-std/Test.sol";
-// import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol"; Updated mock location
 import {ERC20Mock} from "../../mocks/ERC20Mock.sol";
 
 import {MockV3Aggregator} from "../../mocks/MockV3Aggregator.sol";
@@ -41,9 +40,7 @@ contract StopOnRevertHandler is Test {
 
     // FUNCTOINS TO INTERACT WITH
 
-    ///////////////
-    // DSCEngine //
-    ///////////////
+    // DSCEngine 
     function mintAndDepositCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
         // must be more than 0
         amountCollateral = bound(amountCollateral, 1, MAX_DEPOSIT_SIZE);
@@ -61,7 +58,6 @@ contract StopOnRevertHandler is Test {
         uint256 maxCollateral = dscEngine.getCollateralBalanceOfUser(msg.sender, address(collateral));
 
         amountCollateral = bound(amountCollateral, 0, maxCollateral);
-        //vm.prank(msg.sender);
         if (amountCollateral == 0) {
             return;
         }
@@ -81,13 +77,6 @@ contract StopOnRevertHandler is Test {
         vm.stopPrank();
     }
 
-    // Only the DSCEngine can mint DSC!
-    // function mintDsc(uint256 amountDsc) public {
-    //     amountDsc = bound(amountDsc, 0, MAX_DEPOSIT_SIZE);
-    //     vm.prank(dsc.owner());
-    //     dsc.mint(msg.sender, amountDsc);
-    // }
-
     function liquidate(uint256 collateralSeed, address userToBeLiquidated, uint256 debtToCover) public {
         uint256 minHealthFactor = dscEngine.getMinHealthFactor();
         uint256 userHealthFactor = dscEngine.getHealthFactor(userToBeLiquidated);
@@ -99,9 +88,7 @@ contract StopOnRevertHandler is Test {
         dscEngine.liquidate(address(collateral), userToBeLiquidated, debtToCover);
     }
 
-    /////////////////////////////
-    // DecentralizedStableCoin //
-    /////////////////////////////
+    // DecentralizedStableCoin 
     function transferDsc(uint256 amountDsc, address to) public {
         if (to == address(0)) {
             to = address(1);
@@ -111,9 +98,7 @@ contract StopOnRevertHandler is Test {
         dsc.transfer(to, amountDsc);
     }
 
-    /////////////////////////////
-    // Aggregator //
-    /////////////////////////////
+    // Aggregator 
     function updateCollateralPrice(uint96 newPrice, uint256 collateralSeed) public {
         int256 intNewPrice = int256(uint256(newPrice));
         ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);

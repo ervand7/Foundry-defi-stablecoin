@@ -18,7 +18,6 @@ import {StdCheats} from "forge-std/StdCheats.sol";
 
 contract DSCEngineTest is Test {
     event CollateralRedeemed(address indexed redeemFrom, address indexed redeemTo, address token, uint256 amount); // if
-        // redeemFrom != redeemedTo, then it was liquidated
 
     DSCEngine public dsce;
     DecentralizedStableCoin public dsc;
@@ -47,42 +46,11 @@ contract DSCEngineTest is Test {
         (dsc, dsce, helperConfig) = deployer.run();
         (ethUsdPriceFeed, btcUsdPriceFeed, weth, wbtc) = helperConfig.activeNetworkConfig();
 
-        // if (block.chainid == 31337) {
-        //     vm.deal(user, STARTING_USER_BALANCE);
-        // }
-
-        // Should we put our integration tests here?
-        // else {
-        //     user = vm.addr(deployerKey);
-        //     ERC20Mock mockErc = new ERC20Mock("MOCK", "MOCK", user, 100e18);
-        //     MockV3Aggregator aggregatorMock = new MockV3Aggregator(
-        //         helperConfig.DECIMALS(),
-        //         helperConfig.ETH_USD_PRICE()
-        //     );
-        //     vm.etch(weth, address(mockErc).code);
-        //     vm.etch(wbtc, address(mockErc).code);
-        //     vm.etch(ethUsdPriceFeed, address(aggregatorMock).code);
-        //     vm.etch(btcUsdPriceFeed, address(aggregatorMock).code);
-        // }
-
-        // Mint the STARTING_USER_BALANCE of WETH and WBTC tokens to the user's address.
-        // This ensures that the user has sufficient tokens to deposit as collateral during the tests.
-        // By minting these tokens, we simulate a real-world scenario where the user already holds tokens
-        // before interacting with the DSCEngine contract, ensuring that the tests run under realistic conditions.
-
-        // Why .mint instead of vm.deal?
-        // We use minting to provide the user with WETH and WBTC ERC20 tokens, as these tokens
-        // are needed for the depositCollateral function in the DSCEngine contract.
-        // While vm.deal is useful for setting the ETH balance of an address, it doesn't affect ERC20 token balances.
-        // Since our tests involve interacting with ERC20 tokens, we need to mint these tokens directly
-        // to the user's address to simulate a realistic scenario where the user holds these tokens.
         ERC20Mock(weth).mint(USER, STARTING_USER_BALANCE);
         ERC20Mock(wbtc).mint(USER, STARTING_USER_BALANCE);
     }
 
-    ///////////////////////
-    // Constructor Tests //
-    ///////////////////////
+    // Constructor Tests
     address[] public tokenAddresses;
     address[] public feedAddresses;
 
@@ -95,13 +63,9 @@ contract DSCEngineTest is Test {
         new DSCEngine(tokenAddresses, feedAddresses, address(dsc));
     }
 
-    //////////////////
-    // Price Tests //
-    //////////////////
-
+    // Price Tests
     function testGetUsdValue() public {
         uint256 ethAmount = 15e18;
-        // 15e18 ETH * $2000/ETH = $30,000e18
         uint256 expectedUsd = 30_000e18;
         uint256 usdValue = dsce.getUsdValue(weth, ethAmount);
         assertEq(usdValue, expectedUsd);
@@ -114,15 +78,9 @@ contract DSCEngineTest is Test {
         assertEq(amountWeth, expectedWeth);
     }
 
-    //////////////////////////////////////
-    // depositCollateral Tests //
-    ///////////////////////////////////////
+    // depositCollateral Tests
     function testRevertsIfCollateralZero() public {
         vm.startPrank(USER);
-        // Approve the DSCEngine contract to spend the specified amount of WETH tokens on behalf of the user.
-        // This is necessary for the depositCollateral function to later call transferFrom to move the tokens.
-        // Even though the test is checking for a zero deposit (which should revert), this approval simulates
-        // realistic conditions where the contract has the user's permission to transfer tokens.
         ERC20Mock(weth).approve(address(dsce), AMOUNT_COLLATERAL);
 
         vm.expectRevert(DSCEngine.DSCEngine__NeedsMoreThanZero.selector);
